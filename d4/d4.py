@@ -25,9 +25,10 @@ def search_word(grid, word, row, col, direction, rows, cols):
 # Search XMAS
 def x_mas(grid,row,column) :
     #check to see if it's an a
+    if column == 0 or row == 0: return False
     try:
         if grid[row][column] == "A":
-            print(grid[row-1][column-1]) 
+            # print(grid[row-1][column-1]) 
             if (grid[row-1][column-1] == "M" and grid[row+1][column+1] == "S") and (grid[row-1][column+1] == "M" and grid[row+1][column-1] == "S"):
                 return True
             if (grid[row-1][column-1] == "S" and grid[row+1][column+1] == "M") and (grid[row-1][column+1] == "S" and grid[row+1][column-1] == "M"):
@@ -66,4 +67,4 @@ with open("input", "r") as f:
 # Example usage
 word_to_search = "XMAS"  # Replace with the word you want to find
 
-print(find_word(data_structure, word_to_search))
+print("count 1",find_word(data_structure, word_to_search))
