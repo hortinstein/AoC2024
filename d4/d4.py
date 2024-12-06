@@ -24,7 +24,6 @@ def search_word(grid, word, row, col, direction, rows, cols):
 
 # Search XMAS
 def x_mas(grid,row,column) :
-    #check to see if it's an a
     if column == 0 or row == 0: return False
     try:
         if grid[row][column] == "A":
