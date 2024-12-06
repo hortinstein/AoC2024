@@ -10,7 +10,7 @@ def check_valid(order, page_ordering_before):
         if order[i] in page_ordering_before:
 
             if order[i+1] not in page_ordering_before[order[i]]:
-                print (colored((order[i], order[i+1]),'red')) 
+                # print (colored((order[i], order[i+1]),'red')) 
                 invalid_pairs.append((order[i], order[i+1]))
                 valid = False
             
@@ -18,7 +18,7 @@ def check_valid(order, page_ordering_before):
 
             for test in order[:i+1]:
                 if test in page_ordering_before[order[i+1]]:
-                    print (colored((order[i], order[i+1]),'red')) 
+                    # print (colored((order[i], order[i+1]),'red')) 
                     invalid_pairs.append((order[i], order[i+1]))
                     valid = False
     return valid, invalid_pairs
@@ -58,10 +58,7 @@ print("part1",add_middle)
 
 add_middle = 0
 
-for update in invalid_updates:
-    print(update)
-    order = update[0]
-    invalid_pairs = update[1]
+def do_swaps(order, invalid_pairs):
     for pair in invalid_pairs:        
         # Find their indices
         index1 = order.index(pair[0])
@@ -69,8 +66,22 @@ for update in invalid_updates:
 
         # Swap the items
         order[index1], order[index2] = order[index2], order[index1]
-        print (order)
     print(colored(order,'green'))
+    return order,invalid_pairs
+
+for update in invalid_updates:
+    print(update)
+    order = update[0]
+    invalid_pairs = set(update[1]) #eliminate duplicates so it doesnt swap twice
+    valid = False
+    while not valid:
+        order, invalid_pairs = do_swaps(order, invalid_pairs)
+        valid, invalid_pairs = check_valid(order, page_ordering_before)
+    if valid:
+        print (colored(("Valid:",order), "green"))
+    else :
+        print (colored(("Invalid:",order,invalid_pairs), "red"))
+        continue    
     add_middle += int(order[len(order) // 2])
 
 print("part2",add_middle)
