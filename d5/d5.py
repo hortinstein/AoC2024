@@ -1,4 +1,5 @@
 from termcolor import colored
+from collections import defaultdict, deque
 
 f = open("input", "r")
 
@@ -58,30 +59,50 @@ print("part1",add_middle)
 
 add_middle = 0
 
-def do_swaps(order, invalid_pairs):
-    for pair in invalid_pairs:        
-        # Find their indices
-        index1 = order.index(pair[0])
-        index2 = order.index(pair[1])
-
-        # Swap the items
-        order[index1], order[index2] = order[index2], order[index1]
-    print(colored(order,'green'))
-    return order,invalid_pairs
+def topological_sort(items, ordering_rules):
+    # Build graph and calculate in-degrees
+    graph = defaultdict(list)
+    in_degree = defaultdict(int)
+    
+    # Add all items to ensure isolated nodes are included
+    all_nodes = set(items)
+    
+    # Build the graph based on ordering rules
+    for item in items:
+        if item in ordering_rules:
+            for after in ordering_rules[item]:
+                graph[item].append(after)
+                in_degree[after] += 1
+                all_nodes.add(after)
+    
+    # Initialize queue with nodes that have no prerequisites
+    queue = deque([node for node in all_nodes if in_degree[node] == 0])
+    result = []
+    
+    # Process the queue
+    while queue:
+        node = queue.popleft()
+        result.append(node)
+        
+        for neighbor in graph[node]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+    
+    # If result length doesn't match number of nodes, there's a cycle
+    if len(result) != len(all_nodes):
+        return None
+        
+    return result
 
 for update in invalid_updates:
-    print(update)
     order = update[0]
-    invalid_pairs = set(update[1]) #eliminate duplicates so it doesnt swap twice
-    valid = False
-    while not valid:
-        order, invalid_pairs = do_swaps(order, invalid_pairs)
-        valid, invalid_pairs = check_valid(order, page_ordering_before)
-    if valid:
-        print (colored(("Valid:",order), "green"))
-    else :
-        print (colored(("Invalid:",order,invalid_pairs), "red"))
-        continue    
-    add_middle += int(order[len(order) // 2])
+    sorted_order = topological_sort(order, page_ordering_before)
+    
+    if sorted_order:
+        print(colored(("Valid:", sorted_order), "green"))
+        add_middle += int(sorted_order[len(sorted_order) // 2])
+    else:
+        print(colored(("Invalid: Cycle detected in ordering", order), "red"))
 
 print("part2",add_middle)
